@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=OpenVXE Tray
+GenericName=Mouse battery monitor
+Comment=Show the VXE R1 SE+ battery level in the system tray
+Exec=openvxe-tray
+Icon=input-mouse
+Terminal=false
+Categories=System;Monitor;
+X-KDE-autostart-phase=2

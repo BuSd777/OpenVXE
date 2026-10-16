@@ -1,9 +1,30 @@
 [package]
-name = "vxe_driver"
+name = "openvxe"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.88"
+description = "Open-source configuration TUI for the VXE R1 SE+ wireless mouse"
+license = "GPL-3.0-only"
+repository = "https://github.com/BuSd777/OpenVXE"
+readme = "README.md"
+keywords = ["mouse", "hid", "tui", "vxe", "linux"]
+categories = ["command-line-utilities", "hardware-support"]
+default-run = "openvxe"
 
 [dependencies]
-crossterm = "0.27"
-ratatui = "0.26"
+crossterm = "0.29"
+ratatui = "0.30"
 hidapi = "2.4"
+thiserror = "2"
+anyhow = "1"
+ksni = { version = "0.3", default-features = false, features = ["async-io", "blocking"], optional = true }
+notify-rust = { version = "4", default-features = false, features = ["z"], optional = true }
+
+[features]
+default = ["tray"]
+# The openvxe-tray binary: battery level in the system tray (KDE Plasma and other SNI hosts).
+tray = ["dep:ksni", "dep:notify-rust"]
+
+[[bin]]
+name = "openvxe-tray"
+required-features = ["tray"]

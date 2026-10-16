@@ -1,0 +1,61 @@
+# Maintainer: FrancescoLFM <speedartemmekappose@gmail.com>
+
+pkgname=openvxe-git
+_pkgname=OpenVXE
+pkgver=0.1.0.r21.0d090bd
+pkgrel=1
+pkgdesc="Open-source configuration TUI and battery tray icon for the VXE R1 SE+ wireless mouse"
+arch=('x86_64' 'aarch64')
+url="https://github.com/FrancescoLFM/OpenVXE"
+license=('GPL-3.0-only')
+# hidapi's linux-static-hidraw backend compiles hid.c and links libudev.
+depends=('gcc-libs' 'glibc' 'systemd-libs')
+optdepends=('konsole: "Open OpenVXE" entry of the tray menu')
+makedepends=('cargo' 'git' 'pkgconf')
+provides=('openvxe')
+conflicts=('openvxe')
+options=('!lto' '!debug')
+install=openvxe.install
+source=("git+$url.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$_pkgname"
+  printf "%s.r%s.%s" \
+    "$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)" \
+    "$(git rev-list --count HEAD)" \
+    "$(git rev-parse --short=7 HEAD)"
+}
+
+prepare() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo build --frozen --release --bins
+}
+
+check() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo test --frozen --release
+}
+
+package() {
+  cd "$_pkgname"
+  install -Dm755 -t "$pkgdir/usr/bin" \
+    target/release/openvxe \
+    target/release/vxe-probe \
+    target/release/vxe-decode \
+    target/release/openvxe-tray
+  install -Dm644 udev/70-openvxe.rules "$pkgdir/usr/lib/udev/rules.d/70-openvxe.rules"
+  install -Dm644 packaging/desktop/openvxe-tray.desktop "$pkgdir/usr/share/applications/openvxe-tray.desktop"
+  install -Dm644 packaging/desktop/openvxe-tray.desktop "$pkgdir/etc/xdg/autostart/openvxe-tray.desktop"
+  install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname" README.md docs/PROTOCOL.md docs/CAPTURE.md
+}

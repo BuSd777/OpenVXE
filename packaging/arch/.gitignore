@@ -1,0 +1,5 @@
+OpenVXE/
+src/
+pkg/
+*.pkg.tar.*
+*.log

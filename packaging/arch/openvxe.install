@@ -1,0 +1,8 @@
+post_install() {
+  echo ">>> udev rules installed: unplug and replug the VXE USB dongle"
+  echo ">>> to use openvxe without root."
+}
+
+post_upgrade() {
+  post_install
+}
